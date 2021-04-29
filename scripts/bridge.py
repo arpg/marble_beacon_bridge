@@ -13,26 +13,32 @@ class BRIDGE:
         # Create Publisher to Beacon Drop
         self.pub_drop = rospy.Publisher('/'+robot_ns+'/beacon/release_beacon',SetChannel,queue_size=10)
         self.store_servo_info = [0,0,0,0,0,0,0,0]
+        self.beacon_stage = 0
 
     def status_cb(self,msg):
         self.store_servo_info = msg.position
 
     def deploy_cb(self,msg):
-        drop = SetChannel()
-        drop.state = 1
-        if self.store_servo_info[0] >= 0 and self.store_servo_info[0] <= 100:
-            drop.id = 0
+        if msg.data == True:
+            drop = SetChannel()
+            drop.state = 1
+            drop.id = self.beacon_stage
             self.pub_drop.publish(drop)
-        elif self.store_servo_info[1] >= 0 and self.store_servo_info[1] <= 100:
-            drop.id = 1
-            self.pub_drop.publish(drop)
-        elif self.store_servo_info[2] >= 0 and self.store_servo_info[2] <= 100:
-            drop.id = 2
-            self.pub_drop.publish(drop)
-        else: 
-            rospy.logwarn('No Beacons to Drop')
-            
+            self.beacon_stage = self.beacon_stage + 1
+            if self.beacon_stage >= 3:
+                rospy.logwarn('No Beacons to Drop')
 
+        #if self.store_servo_info[0] >= 0 and self.store_servo_info[0] <= 100:
+        #    drop.id = 0
+        #    self.pub_drop.publish(drop)
+        #elif self.store_servo_info[1] >= 0 and self.store_servo_info[1] <= 100:
+        #    drop.id = 1
+        #    self.pub_drop.publish(drop)
+        #elif self.store_servo_info[2] >= 0 and self.store_servo_info[2] <= 100:
+        #    drop.id = 2
+        #    self.pub_drop.publish(drop)
+        #else:
+        #    rospy.logwarn('No Beacons to Drop')
 
 def main():
     rospy.init_node('beacon_bridge')
