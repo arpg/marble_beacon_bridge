@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="vehicle_name" default="H01"/>
+	<node pkg="marble_beacon_bridge" type="bridge.py" name="beacon_bridge">
+		<param name="robot_ns" value="$(arg vehicle_name)"/>
+</node>
+
+</launch>
+
